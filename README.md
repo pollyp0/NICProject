@@ -1,6 +1,6 @@
 # Evolutionary Agent Training in the Snake Game
 
-## Group Members
+## Project developers
 - Tarubarova Nadezhda
 - Pokhodyaeva Polina
 - Gusev Saveliy
