@@ -23,6 +23,7 @@ There is no fixed dataset in our project since training occurs through an evolut
 - Action (left, right, forward)  
 
 ### Key Changes
+***NeuralNet.pde***:
 - **Activation Function**: Replaced with a sigmoid activation function in the `activate()` and `sigmoid()` methods.
 - **Mutation**: Improved by introducing random weight changes with a small deviation.
 - **Bias Addition**: Implemented in the `addBias()` method to enhance neural network flexibility.
