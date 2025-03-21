@@ -23,17 +23,7 @@ There is no fixed dataset in our project since training occurs through an evolut
 - Action (left, right, forward)
 
 ## Repository
-We are using an existing Snake AI repository on GitHub: [SnakeAI](https://github.com/greerviau/SnakeAI)
-
-## Installation and Setup
-```sh
-# Clone the repository
-git clone https://github.com/greerviau/SnakeAI.git
-cd SnakeAI
-
-# Run the project
-python run.py
-```
+We are using an existing Snake AI repository on GitHub: [SnakeAI](https://github.com/greerviau/SnakeAI)Ы
 
 ## References
 - [Snake AI (GA) GitHub Repository](https://github.com/greerviau/SnakeAI)
