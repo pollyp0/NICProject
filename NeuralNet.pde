@@ -236,158 +236,313 @@ class NeuralNet {
  * Визуализирует нейронную сеть
  */
 void show(float x, float y, float w, float h, float[] vision, float[] decision) {
+
   float space = 5;
+
   float nSize = (h - (space * (iNodes - 2))) / iNodes;
+
   float nSpace = (w - (weights.length * nSize)) / weights.length;
+
   float hBuff = (h - (space * (hNodes - 1)) - (nSize * hNodes)) / 2;
+
   float oBuff = (h - (space * (oNodes - 1)) - (nSize * oNodes)) / 2;
+
    
+
   // Находим индекс максимального решения
+
   int maxIndex = 0;
+
   for(int i = 1; i < decision.length; i++) {
+
     if(decision[i] > decision[maxIndex]) {
+
       maxIndex = i; 
+
     }
+
   }
+
    
+
   int lc = 0;  // Layer Count
+
    
+
   // ОТРИСОВКА УЗЛОВ
+
   // Рисуем входные узлы
+
   for(int i = 0; i < iNodes; i++) {
+
     if(vision[i] != 0) {
+
       fill(0, 255, 0);
+
     } else {
+
       fill(255); 
+
     }
+
     stroke(0);
+
     ellipseMode(CORNER);
+
     ellipse(x, y + (i * (nSize + space)), nSize, nSize);
+
     textSize(nSize / 2);
+
     textAlign(CENTER, CENTER);
+
     fill(0);
+
     text(i, x + (nSize / 2), y + (nSize / 2) + (i * (nSize + space)));
+
   }
-  
-  lc++;
-  
-  // Рисуем скрытые узлы
-  for(int a = 0; a < hLayers; a++) {
-    for(int i = 0; i < hNodes; i++) {
-      fill(255);
-      stroke(0);
-      ellipseMode(CORNER);
-      ellipse(x + (lc * nSize) + (lc * nSpace), y + hBuff + (i * (nSize + space)), nSize, nSize);
-    }
-    lc++;
-  }
-  
-  // Рисуем выходные узлы
-  for(int i = 0; i < oNodes; i++) {
-    if(i == maxIndex) {
-      fill(0, 255, 0);
-    } else {
-      fill(255); 
-    }
-    stroke(0);
-    ellipseMode(CORNER);
-    ellipse(x + (lc * nSpace) + (lc * nSize), y + oBuff + (i * (nSize + space)), nSize, nSize);
-    
-    // Добавляем процент уверенности
-    fill(0);
-    textSize(nSize / 3);
-    textAlign(CENTER, CENTER);
-    text(nf(decision[i] * 100, 0, 0) + "%", 
-         x + (lc * nSpace) + (lc * nSize) + nSize/2, 
-         y + oBuff + (nSize/2) + (i * (nSize + space)));
-  }
-  
-  lc = 1;
-  
-  // ОТРИСОВКА ВЕСОВ
-  // Веса от входного к первому скрытому слою
-  for(int i = 0; i < weights[0].rows; i++) {
-    for(int j = 0; j < weights[0].cols - 1; j++) {
-      float weight = weights[0].matrix[i][j];
-      float absWeight = abs(weight);
-      
-      // Меняем толщину линии в зависимости от силы веса
-      strokeWeight(map(absWeight, 0, 1, 0.5, 2.5));
-      
-      // Прозрачность также зависит от силы веса
-      int alpha = (int)map(absWeight, 0, 1, 50, 200);
-      
-      if(weight < 0) {
-        stroke(255, 0, 0, alpha); // красный для отрицательных
-      } else {
-        stroke(0, 0, 255, alpha); // синий для положительных
-      }
-      
-      line(x + nSize, 
-           y + (nSize / 2) + (j * (space + nSize)),
-           x + nSize + nSpace, 
-           y + hBuff + (nSize / 2) + (i * (space + nSize)));
-    }
-  }
-  
-  lc++;
-  
-  // Веса между скрытыми слоями
-  for(int a = 1; a < hLayers; a++) {
-    for(int i = 0; i < weights[a].rows; i++) {
-      for(int j = 0; j < weights[a].cols - 1; j++) {
-        float weight = weights[a].matrix[i][j];
-        float absWeight = abs(weight);
-        
-        strokeWeight(map(absWeight, 0, 1, 0.5, 2.5));
-        int alpha = (int)map(absWeight, 0, 1, 50, 200);
-        
-        if(weight < 0) {
-          stroke(255, 0, 0, alpha); 
-        } else {
-          stroke(0, 0, 255, alpha); 
-        }
-        
-        line(x + (lc * nSize) + ((lc - 1) * nSpace),
-             y + hBuff + (nSize / 2) + (j * (space + nSize)),
-             x + (lc * nSize) + (lc * nSpace),
-             y + hBuff + (nSize / 2) + (i * (space + nSize)));
-      }
-    }
-    lc++;
-  }
-  
-  // Веса от последнего скрытого слоя к выходному
-  for(int i = 0; i < weights[weights.length - 1].rows; i++) {
-    for(int j = 0; j < weights[weights.length - 1].cols - 1; j++) {
-      float weight = weights[weights.length - 1].matrix[i][j];
-      float absWeight = abs(weight);
-      
-      strokeWeight(map(absWeight, 0, 1, 0.5, 2.5));
-      int alpha = (int)map(absWeight, 0, 1, 50, 200);
-      
-      if(weight < 0) {
-        stroke(255, 0, 0, alpha); 
-      } else {
-        stroke(0, 0, 255, alpha); 
-      }
-      
-      line(x + (lc * nSize) + ((lc - 1) * nSpace),
-           y + hBuff + (nSize / 2) + (j * (space + nSize)),
-           x + (lc * nSize) + (lc * nSpace),
-           y + oBuff + (nSize / 2) + (i * (space + nSize)));
-    }
-  }
-  
-  // Добавляем подписи для выходных узлов
-  strokeWeight(1); // Сбрасываем толщину линии
-  fill(0);
-  textSize(15);
-  textAlign(CENTER, CENTER);
-  text("U", x + (lc * nSize) + (lc * nSpace) + nSize / 2, y + oBuff + (nSize / 2));
-  text("D", x + (lc * nSize) + (lc * nSpace) + nSize / 2, y + oBuff + space + nSize + (nSize / 2));
-  text("L", x + (lc * nSize) + (lc * nSpace) + nSize / 2, y + oBuff + (2 * space) + (2 * nSize) + (nSize / 2));
-  text("R", x + (lc * nSize) + (lc * nSpace) + nSize / 2, y + oBuff + (3 * space) + (3 * nSize) + (nSize / 2));
-}
 
   
+
+  lc++;
+
+  
+
+  // Рисуем скрытые узлы
+
+  for(int a = 0; a < hLayers; a++) {
+
+    for(int i = 0; i < hNodes; i++) {
+
+      fill(255);
+
+      stroke(0);
+
+      ellipseMode(CORNER);
+
+      ellipse(x + (lc * nSize) + (lc * nSpace), y + hBuff + (i * (nSize + space)), nSize, nSize);
+
+    }
+
+    lc++;
+
+  }
+
+  
+
+  // Рисуем выходные узлы
+
+  for(int i = 0; i < oNodes; i++) {
+
+    if(i == maxIndex) {
+
+      fill(0, 255, 0);
+
+    } else {
+
+      fill(255); 
+
+    }
+
+    stroke(0);
+
+    ellipseMode(CORNER);
+
+    ellipse(x + (lc * nSpace) + (lc * nSize), y + oBuff + (i * (nSize + space)), nSize, nSize);
+
+    
+
+    // Добавляем процент уверенности
+
+    fill(0);
+
+    textSize(nSize / 3);
+
+    textAlign(CENTER, CENTER);
+
+    text(nf(decision[i] * 100, 0, 0) + "%", 
+
+         x + (lc * nSpace) + (lc * nSize) + nSize/2, 
+
+         y + oBuff + (nSize/2) + (i * (nSize + space)));
+
+  }
+
+  
+
+  lc = 1;
+
+  
+
+  // ОТРИСОВКА ВЕСОВ
+
+  // Веса от входного к первому скрытому слою
+
+  for(int i = 0; i < weights[0].rows; i++) {
+
+    for(int j = 0; j < weights[0].cols - 1; j++) {
+
+      float weight = weights[0].matrix[i][j];
+
+      float absWeight = abs(weight);
+
+      
+
+      // Меняем толщину линии в зависимости от силы веса
+
+      strokeWeight(map(absWeight, 0, 1, 0.5, 2.5));
+
+      
+
+      // Прозрачность также зависит от силы веса
+
+      int alpha = (int)map(absWeight, 0, 1, 50, 200);
+
+      
+
+      if(weight < 0) {
+
+        stroke(255, 0, 0, alpha); // красный для отрицательных
+
+      } else {
+
+        stroke(0, 0, 255, alpha); // синий для положительных
+
+      }
+
+      
+
+      line(x + nSize, 
+
+           y + (nSize / 2) + (j * (space + nSize)),
+
+           x + nSize + nSpace, 
+
+           y + hBuff + (nSize / 2) + (i * (space + nSize)));
+
+    }
+
+  }
+
+  
+
+  lc++;
+
+  
+
+  // Веса между скрытыми слоями
+
+  for(int a = 1; a < hLayers; a++) {
+
+    for(int i = 0; i < weights[a].rows; i++) {
+
+      for(int j = 0; j < weights[a].cols - 1; j++) {
+
+        float weight = weights[a].matrix[i][j];
+
+        float absWeight = abs(weight);
+
+        
+
+        strokeWeight(map(absWeight, 0, 1, 0.5, 2.5));
+
+        int alpha = (int)map(absWeight, 0, 1, 50, 200);
+
+        
+
+        if(weight < 0) {
+
+          stroke(255, 0, 0, alpha); 
+
+        } else {
+
+          stroke(0, 0, 255, alpha); 
+
+        }
+
+        
+
+        line(x + (lc * nSize) + ((lc - 1) * nSpace),
+
+             y + hBuff + (nSize / 2) + (j * (space + nSize)),
+
+             x + (lc * nSize) + (lc * nSpace),
+
+             y + hBuff + (nSize / 2) + (i * (space + nSize)));
+
+      }
+
+    }
+
+    lc++;
+
+  }
+
+  
+
+  // Веса от последнего скрытого слоя к выходному
+
+  for(int i = 0; i < weights[weights.length - 1].rows; i++) {
+
+    for(int j = 0; j < weights[weights.length - 1].cols - 1; j++) {
+
+      float weight = weights[weights.length - 1].matrix[i][j];
+
+      float absWeight = abs(weight);
+
+      
+
+      strokeWeight(map(absWeight, 0, 1, 0.5, 2.5));
+
+      int alpha = (int)map(absWeight, 0, 1, 50, 200);
+
+      
+
+      if(weight < 0) {
+
+        stroke(255, 0, 0, alpha); 
+
+      } else {
+
+        stroke(0, 0, 255, alpha); 
+
+      }
+
+      
+
+      line(x + (lc * nSize) + ((lc - 1) * nSpace),
+
+           y + hBuff + (nSize / 2) + (j * (space + nSize)),
+
+           x + (lc * nSize) + (lc * nSpace),
+
+           y + oBuff + (nSize / 2) + (i * (space + nSpace)));
+
+    }
+
+  }
+
+  
+
+  // Сбрасываем толщину линии
+
+  strokeWeight(1);
+
+  
+
+  // Добавляем подписи для выходных узлов
+
+  fill(0);
+
+  textSize(15);
+
+  textAlign(CENTER, CENTER);
+
+  text("U", x + (lc * nSize) + (lc * nSpace) + nSize / 2, y + oBuff + (nSize / 2));
+
+  text("D", x + (lc * nSize) + (lc * nSpace) + nSize / 2, y + oBuff + space + nSize + (nSize / 2));
+
+  text("L", x + (lc * nSize) + (lc * nSpace) + nSize / 2, y + oBuff + (2 * space) + (2 * nSize) + (nSize / 2));
+
+  text("R", x + (lc * nSize) + (lc * nSpace) + nSize / 2, y + oBuff + (3 * space) + (3 * nSize) + (nSize / 2));
+
+}
