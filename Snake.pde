@@ -5,19 +5,14 @@ class Snake {
   int lifetime = 0;
   int xVel, yVel;
   int foodItterate = 0;
-  
   float fitness = 0;
-  
   boolean dead = false;
   boolean replay = false;
-  
   float[] vision;
   float[] decision;
-  
   PVector head;
   ArrayList<PVector> body;
   ArrayList<Food> foodList;
-  
   Food food;
   NeuralNet brain;
   
@@ -30,12 +25,12 @@ class Snake {
     food = new Food();
     body = new ArrayList<PVector>();
     if(!humanPlaying) {
-      vision   = new float[24];
+      vision = new float[24];
       decision = new float[4];
       foodList = new ArrayList<Food>();
       foodList.add(food.clone());
       brain = new NeuralNet(24, hidden_nodes, 4, layers);
-      body.add(new PVector(800,(height/2)+SIZE));  
+      body.add(new PVector(800,(height/2)+SIZE));
       body.add(new PVector(800,(height/2)+(2*SIZE)));
       score += 2;
     }
@@ -60,7 +55,7 @@ class Snake {
   
   boolean bodyCollide(float x, float y) {
      for(int i = 0; i < body.size(); i++) {
-        if(x == body.get(i).x && y == body.get(i).y)  {
+        if(x == body.get(i).x && y == body.get(i).y) {
            return true;
         }
      }
@@ -115,7 +110,7 @@ class Snake {
     if(!humanPlaying && !modelLoaded) {
       if(lifeLeft < 500) {
         if(lifeLeft > 400) {
-           lifeLeft = 500; 
+           lifeLeft = 500;
         } else {
           lifeLeft += 100;
         }
@@ -124,7 +119,7 @@ class Snake {
     if(len >= 0) {
       body.add(new PVector(body.get(len).x, body.get(len).y));
     } else {
-      body.add(new PVector(head.x, head.y)); 
+      body.add(new PVector(head.x, head.y));
     }
     if(!replay) {
       food = new Food();
@@ -175,12 +170,12 @@ class Snake {
   }
   
   void mutate() {
-     brain.mutate(mutationRate); 
+     brain.mutate(mutationRate);
   }
   
   void calculateFitness() {
      if(score < 10) {
-        fitness = floor(lifetime * lifetime) * pow(2, score); 
+        fitness = floor(lifetime * lifetime) * pow(2, score);
      } else {
         fitness = floor(lifetime * lifetime);
         fitness *= pow(2, 10);
@@ -227,8 +222,30 @@ class Snake {
         bodyFound = true;
         look[1] = 1;
       }
+      if(replay && seeVision) {
+        stroke(0,255,0);
+        point(pos.x,pos.y);
+        if(foodFound) {
+           noStroke();
+           fill(255,255,51);
+           ellipseMode(CENTER);
+           ellipse(pos.x,pos.y,5,5);
+        }
+        if(bodyFound) {
+           noStroke();
+           fill(102,0,102);
+           ellipseMode(CENTER);
+           ellipse(pos.x,pos.y,5,5);
+        }
+      }
       pos.add(direction);
       distance += 1;
+    }
+    if(replay && seeVision) {
+       noStroke();
+       fill(0,255,0);
+       ellipseMode(CENTER);
+       ellipse(pos.x,pos.y,5,5);
     }
     look[2] = 1/distance;
     return look;
@@ -254,25 +271,28 @@ class Snake {
   
   void moveUp() {
     if(yVel != SIZE) {
-      xVel = 0; 
+      xVel = 0;
       yVel = -SIZE;
     }
   }
+  
   void moveDown() {
     if(yVel != -SIZE) {
-      xVel = 0; 
-      yVel = SIZE; 
+      xVel = 0;
+      yVel = SIZE;
     }
   }
+  
   void moveLeft() {
     if(xVel != SIZE) {
-      xVel = -SIZE; 
-      yVel = 0; 
+      xVel = -SIZE;
+      yVel = 0;
     }
   }
+  
   void moveRight() {
     if(xVel != -SIZE) {
-      xVel = SIZE; 
+      xVel = SIZE;
       yVel = 0;
     }
   }
